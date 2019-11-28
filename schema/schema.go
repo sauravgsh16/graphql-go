@@ -13,19 +13,21 @@ var Schema graphql.Schema
 
 // MustInit initializes the GraphQL schema, panics otherwise
 func MustInit(r ...resolver.GraphQLResolver) {
-	var allFields graphql.Fields
+	var queryFields graphql.Fields
 
-	allFields = make(map[string]*graphql.Field, 0)
+	queryFields = make(map[string]*graphql.Field, 0)
+
+	// Add query fields
 	for _, rv := range r {
 		switch rv.(type) {
 		case *resolver.AuthorResolver:
 			for name, field := range getAuthors(rv) {
-				allFields[name] = field
+				queryFields[name] = field
 			}
 
 		case *resolver.BookResolver:
 			for name, field := range getBooks(rv) {
-				allFields[name] = field
+				queryFields[name] = field
 			}
 		default:
 			panic(fmt.Sprintf("Resolver %T: Not Implemented", rv))
@@ -34,11 +36,18 @@ func MustInit(r ...resolver.GraphQLResolver) {
 
 	rootQuery := graphql.ObjectConfig{
 		Name:   "RootQuery",
-		Fields: allFields,
+		Fields: queryFields,
 	}
 
+	mutation := graphql.ObjectConfig{
+		Name:   "Mutation",
+		Fields: getAuthorMutationFields(),
+	}
+	// @TODO: Need to add mutation for books
+
 	schemaConfig := graphql.SchemaConfig{
-		Query: graphql.NewObject(rootQuery),
+		Query:    graphql.NewObject(rootQuery),
+		Mutation: graphql.NewObject(mutation),
 	}
 
 	var err error

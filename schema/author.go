@@ -5,8 +5,10 @@ import (
 	"github.com/sauravgsh16/graphql-go/resolver"
 )
 
+var authorType *graphql.Object
+
 func getAuthors(r resolver.GraphQLResolver) graphql.Fields {
-	var authorType = graphql.NewObject(graphql.ObjectConfig{
+	authorType = graphql.NewObject(graphql.ObjectConfig{
 		Name: "Author",
 		Fields: graphql.Fields{
 			"id": &graphql.Field{

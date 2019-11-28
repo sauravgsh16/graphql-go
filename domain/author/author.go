@@ -47,7 +47,7 @@ func (a *Author) Select(id int) error {
 }
 
 // Insert an author into the database
-func (a *Author) Insert(name, string, age int) error {
+func (a *Author) Insert() error {
 	conn, ctx, err := domain.GetConn()
 	if err != nil {
 		return err
@@ -61,7 +61,7 @@ func (a *Author) Insert(name, string, age int) error {
 
 	var returnedID int
 
-	if err := stmt.QueryRowContext(ctx, name, age).Scan(&returnedID); err != nil {
+	if err := stmt.QueryRowContext(ctx, a.Name, a.Age).Scan(&returnedID); err != nil {
 		return err
 	}
 	a.ID = returnedID
@@ -109,16 +109,17 @@ func (a *Author) SelectAll() ([]*Author, error) {
 	var authors []*Author
 
 	for rows.Next() {
-		a := &Author{}
-		if err := rows.Scan(&a.ID, &a.Name, &a.Age); err != nil {
+		au := &Author{}
+		if err := rows.Scan(&au.ID, &au.Name, &au.Age); err != nil {
 			return nil, err
 		}
 
-		authors = append(authors, a)
+		authors = append(authors, au)
 	}
 
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
+
 	return authors, nil
 }

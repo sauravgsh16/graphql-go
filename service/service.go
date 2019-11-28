@@ -10,4 +10,5 @@ type Service interface {
 	Create(domain.Object) (domain.Object, error)
 	Delete(int) error
 	GetAll() ([]domain.Object, error)
+	GetAllByKey(int) (interface{}, error)
 }

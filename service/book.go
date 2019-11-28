@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/sauravgsh16/graphql-go/domain"
+	"github.com/sauravgsh16/graphql-go/domain/author"
 	"github.com/sauravgsh16/graphql-go/domain/book"
 )
 
@@ -27,12 +28,23 @@ func (bs *BookService) GetAll() ([]domain.Object, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	var objs []domain.Object
 	for _, b := range books {
 		objs = append(objs, b)
 	}
 
 	return objs, nil
+}
+
+// GetAllByKey return author by author_id
+func (bs *BookService) GetAllByKey(auid int) (interface{}, error) {
+	a := &author.Author{}
+	err := a.Select(auid)
+	if err != nil {
+		return nil, err
+	}
+	return a, nil
 }
 
 // Create receiver for Bookservice

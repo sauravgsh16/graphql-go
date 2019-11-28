@@ -5,8 +5,10 @@ import (
 	"github.com/sauravgsh16/graphql-go/resolver"
 )
 
+var bookType *graphql.Object
+
 func getBooks(r resolver.GraphQLResolver) graphql.Fields {
-	var bookType = graphql.NewObject(graphql.ObjectConfig{
+	bookType = graphql.NewObject(graphql.ObjectConfig{
 		Name: "Book",
 		Fields: graphql.Fields{
 			"id": &graphql.Field{
@@ -17,6 +19,10 @@ func getBooks(r resolver.GraphQLResolver) graphql.Fields {
 			},
 			"genre": &graphql.Field{
 				Type: graphql.String,
+			},
+			"author": &graphql.Field{
+				Type:    graphql.Type(authorType),
+				Resolve: r.JoinResolver,
 			},
 		},
 	})

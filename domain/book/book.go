@@ -5,27 +5,29 @@ import (
 )
 
 const (
-	selectQuery    = `SELECT ID, NAME, GENRE FROM books WHERE ID=($1);`
-	insertQuery    = `INSERT INTO books (NAME, GENRE ) VALUES ($1, $2) RETURNING ID;`
-	updateQuery    = `UPDATE books SET NAME=($1), GENRE=($2) WHERE ID=($3);`
-	deleteQuery    = `DELETE FROM books WHERE ID=($1);`
-	selectAllQuery = `SELECT ID, NAME, GENRE FROM books;`
+	selectQuery       = `SELECT ID, NAME, GENRE, AUTHOR_ID FROM books WHERE ID=($1);`
+	insertQuery       = `INSERT INTO books (NAME, GENRE, AUTHOR_ID ) VALUES ($1, $2, $3) RETURNING ID;`
+	updateQuery       = `UPDATE books SET NAME=($1), GENRE=($2), AUTHOR_ID=($3) WHERE ID=($4);`
+	deleteQuery       = `DELETE FROM books WHERE ID=($1);`
+	selectAllQuery    = `SELECT ID, NAME, GENRE, AUTHOR_ID FROM books;`
+	selectAuthorQuery = `SELECT ID, NAME, GENRE, AUTHOR_ID FROM books WHERE AUTHOR_ID=($1);`
 )
 
 // Book struct
 type Book struct {
-	ID    int
-	Name  string
-	Genre string
+	ID       int    `json:"id"`
+	Name     string `json:"name"`
+	Genre    string `json:"genre"`
+	AuthorID int    `json:"author_id"`
 }
 
 // CanQuery returns true
-func (a *Book) CanQuery() bool {
+func (b *Book) CanQuery() bool {
 	return true
 }
 
 // Select a book from the db with matching ID
-func (a *Book) Select(id int) error {
+func (b *Book) Select(id int) error {
 	conn, ctx, err := domain.GetConn()
 	if err != nil {
 		return err
@@ -39,15 +41,50 @@ func (a *Book) Select(id int) error {
 
 	row := stmt.QueryRowContext(ctx, id)
 
-	if err := row.Scan(&a.ID, &a.Name, &a.Genre); err != nil {
+	if err := row.Scan(&b.ID, &b.Name, &b.Genre, &b.AuthorID); err != nil {
 		return err
 	}
 
 	return nil
 }
 
+// SelectAllByAuthorID returns all books with author id
+func (b *Book) SelectAllByAuthorID(authID int) ([]*Book, error) {
+	conn, ctx, err := domain.GetConn()
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+
+	stmt, err := conn.PrepareContext(ctx, selectAuthorQuery)
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := stmt.QueryContext(ctx, authID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var books []*Book
+
+	for rows.Next() {
+		bk := &Book{}
+		if err := rows.Scan(&bk.ID, &bk.Name, &bk.Genre, &bk.AuthorID); err != nil {
+			return nil, err
+		}
+		books = append(books, bk)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return books, nil
+}
+
 // Insert an Book into the database
-func (a *Book) Insert(name, genre string) error {
+func (b *Book) Insert() error {
 	conn, ctx, err := domain.GetConn()
 	if err != nil {
 		return err
@@ -61,15 +98,15 @@ func (a *Book) Insert(name, genre string) error {
 
 	var returnedID int
 
-	if err := stmt.QueryRowContext(ctx, name, genre).Scan(&returnedID); err != nil {
+	if err := stmt.QueryRowContext(ctx, b.Name, b.Genre, b.AuthorID).Scan(&returnedID); err != nil {
 		return err
 	}
-	a.ID = returnedID
+	b.ID = returnedID
 	return nil
 }
 
 // Delete an Book from the database
-func (a *Book) Delete(id int) error {
+func (b *Book) Delete(id int) error {
 	conn, ctx, err := domain.GetConn()
 	if err != nil {
 		return err
@@ -88,7 +125,7 @@ func (a *Book) Delete(id int) error {
 }
 
 // SelectAll returns all books from db
-func (a *Book) SelectAll() ([]*Book, error) {
+func (b *Book) SelectAll() ([]*Book, error) {
 	conn, ctx, err := domain.GetConn()
 	if err != nil {
 		return nil, err
@@ -109,16 +146,17 @@ func (a *Book) SelectAll() ([]*Book, error) {
 	var books []*Book
 
 	for rows.Next() {
-		b := &Book{}
-		if err := rows.Scan(&b.ID, &b.Name, &a.Genre); err != nil {
+		bk := &Book{}
+		if err := rows.Scan(&bk.ID, &bk.Name, &bk.Genre, &bk.AuthorID); err != nil {
 			return nil, err
 		}
 
-		books = append(books, b)
+		books = append(books, bk)
 	}
 
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
+
 	return books, nil
 }
