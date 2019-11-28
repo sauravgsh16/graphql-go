@@ -10,15 +10,7 @@ type GraphQLResolver interface {
 	AllResolver(p graphql.ResolveParams) (interface{}, error)
 }
 
-type Resolver struct {
-	Author GraphQLResolver
-	Book   GraphQLResolver
-}
-
-// NewResolver returns new resolver
-func NewResolver() *Resolver {
-	return &Resolver{
-		Author: &authorResolver{},
-		Book:   &bookResolver{},
-	}
+// AllResolvers returns a list of GraphQLResolver
+func AllResolvers() []GraphQLResolver {
+	return []GraphQLResolver{&AuthorResolver{}, &BookResolver{}}
 }

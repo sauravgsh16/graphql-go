@@ -12,14 +12,24 @@ import (
 var Schema graphql.Schema
 
 // MustInit initializes the GraphQL schema, panics otherwise
-func MustInit(r resolver.GraphQLResolver) {
+func MustInit(r ...resolver.GraphQLResolver) {
 	var allFields graphql.Fields
 
-	for name, field := range getAuthors(r) {
-		allFields[name] = field
-	}
-	for name, field := range getBooks(r) {
-		allFields[name] = field
+	allFields = make(map[string]*graphql.Field, 0)
+	for _, rv := range r {
+		switch rv.(type) {
+		case *resolver.AuthorResolver:
+			for name, field := range getAuthors(rv) {
+				allFields[name] = field
+			}
+
+		case *resolver.BookResolver:
+			for name, field := range getBooks(rv) {
+				allFields[name] = field
+			}
+		default:
+			panic(fmt.Sprintf("Resolver %T: Not Implemented", rv))
+		}
 	}
 
 	rootQuery := graphql.ObjectConfig{

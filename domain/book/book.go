@@ -5,9 +5,9 @@ import (
 )
 
 const (
-	selectQuery    = `SELECT id, name, age FROM books WHERE ID=($1);`
-	insertQuery    = `INSERT INTO books (NAME, AGE) VALUES ($1, $2) RETURNING ID;`
-	updateQuery    = `UPDATE books SET NAME=($1), AGE=($2) WHERE ID=($3);`
+	selectQuery    = `SELECT ID, NAME, GENRE FROM books WHERE ID=($1);`
+	insertQuery    = `INSERT INTO books (NAME, GENRE ) VALUES ($1, $2) RETURNING ID;`
+	updateQuery    = `UPDATE books SET NAME=($1), GENRE=($2) WHERE ID=($3);`
 	deleteQuery    = `DELETE FROM books WHERE ID=($1);`
 	selectAllQuery = `SELECT ID, NAME, GENRE FROM books;`
 )

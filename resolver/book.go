@@ -5,9 +5,11 @@ import (
 	"github.com/sauravgsh16/graphql-go/service"
 )
 
-type bookResolver struct{}
+// BookResolver struct
+type BookResolver struct{}
 
-func (r *bookResolver) IndividualResolver(p graphql.ResolveParams) (interface{}, error) {
+// IndividualResolver resolves individual get requests
+func (r BookResolver) IndividualResolver(p graphql.ResolveParams) (interface{}, error) {
 	book, err := service.BookServ.Get(p.Args["id"].(int))
 	if err != nil {
 		return nil, err
@@ -15,7 +17,8 @@ func (r *bookResolver) IndividualResolver(p graphql.ResolveParams) (interface{},
 	return book, nil
 }
 
-func (r *bookResolver) AllResolver(p graphql.ResolveParams) (interface{}, error) {
+// AllResolver resolves all get request
+func (r BookResolver) AllResolver(p graphql.ResolveParams) (interface{}, error) {
 	books, err := service.BookServ.GetAll()
 	if err != nil {
 		return nil, err
