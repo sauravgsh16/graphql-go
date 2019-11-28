@@ -12,10 +12,10 @@ func getAuthors(r resolver.GraphQLResolver) graphql.Fields {
 			"id": &graphql.Field{
 				Type: graphql.Int,
 			},
-			"Name": &graphql.Field{
+			"name": &graphql.Field{
 				Type: graphql.String,
 			},
-			"Age": &graphql.Field{
+			"age": &graphql.Field{
 				Type: graphql.Int,
 			},
 		},

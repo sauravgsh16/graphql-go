@@ -10,9 +10,6 @@ import (
 // GetConn returns a connection to the database and context
 func GetConn() (*sql.Conn, context.Context, error) {
 	ctx := context.Background()
-	conn, err := database.DB.Conn(ctx)
-	if err != nil {
-		return nil, nil, err
-	}
+	conn := database.GetConn(ctx)
 	return conn, ctx, nil
 }
