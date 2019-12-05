@@ -4,6 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
+	"os"
+	"strconv"
 	"sync"
 
 	// postgres driver
@@ -12,12 +15,12 @@ import (
 
 var once sync.Once
 
-const (
-	dbHost = "localhost"
-	dbPort = 5432
-	dbUser = "postgres"
-	dbPwd  = "postgres"
-	dbName = "graphql"
+var (
+	dbHost = os.Getenv("DB_HOST")
+	dbPort = os.Getenv("DB_PORT")
+	dbUser = os.Getenv("DB_USER")
+	dbPwd  = os.Getenv("DB_PWD")
+	dbName = os.Getenv("DB_NAME")
 )
 
 // DB postgres
@@ -25,8 +28,12 @@ var DB *sql.DB
 
 // Init initializes db
 func init() {
+	port, err := strconv.Atoi(dbPort)
+	if err != nil {
+		panic(err)
+	}
 	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		dbHost, dbPort, dbUser, dbPwd, dbName,
+		dbHost, port, dbUser, dbPwd, dbName,
 	)
 	once.Do(func() {
 		var err error
@@ -35,6 +42,7 @@ func init() {
 			panic(err)
 		}
 		if err = DB.Ping(); err != nil {
+			log.Println("I am breaking here")
 			panic(err)
 		}
 	})
