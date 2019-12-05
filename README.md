@@ -19,7 +19,7 @@ $ docker-compose up --build
 ```
 
 #### GraphQL API requests eg.
-```json
+```graphql
 
 query {
     Book (id: 1) {
@@ -29,7 +29,7 @@ query {
 }
 
 ```
-```json
+```graphql
 mutation {
     createAuthor (name: "foo", age: 42) {
         id
