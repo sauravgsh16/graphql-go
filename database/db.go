@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"log"
 	"os"
 	"strconv"
 	"sync"
@@ -42,7 +41,6 @@ func init() {
 			panic(err)
 		}
 		if err = DB.Ping(); err != nil {
-			log.Println("I am breaking here")
 			panic(err)
 		}
 	})
